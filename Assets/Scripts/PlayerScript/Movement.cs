@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem; // <-- AJOUT
 
 public class Movement : MonoBehaviour
 {
@@ -18,25 +19,30 @@ public class Movement : MonoBehaviour
     private bool isOnGround;
     public float positionRadius;
     public LayerMask ground;
-    public Transform playerPos;
+    public Transform playerPos; 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        leftLegRB = leftLegRB.GetComponent<Rigidbody2D>();
-        rightLegRB = rightLegRB.GetComponent<Rigidbody2D>();
+        leftLegRB = leftleg.GetComponent<Rigidbody2D>();
+        rightLegRB = rightleg.GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetAxisRaw("Horizontal") != 0)
+        float horizontal = 0f;
+
+        if (Keyboard.current != null)
         {
-            if (Input.GetAxisRaw("Horizontal") > 0)
+            if (Keyboard.current.aKey.isPressed) horizontal = -1;
+            if (Keyboard.current.dKey.isPressed) horizontal = 0;
+        }
+
+        if (horizontal != 0)
+        {
+            if (horizontal > 0)
             {
                 anim.Play("WalkRight");
                 StartCoroutine(MoveRight(stepWait));
-
             }
             else
             {
@@ -50,11 +56,11 @@ public class Movement : MonoBehaviour
         }
 
         isOnGround = Physics2D.OverlapCircle(playerPos.position, positionRadius, ground);
-        if (isOnGround == true && Input.GetKeyDown(KeyCode.Space))
+
+        if (isOnGround && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             rb.AddForce(Vector2.up * jumpForce);
         }
-
     }
 
     IEnumerator MoveRight(float seconds)
@@ -70,5 +76,4 @@ public class Movement : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         leftLegRB.AddForce(Vector2.left * (speed * 1000) * Time.deltaTime);
     }
-
 }
