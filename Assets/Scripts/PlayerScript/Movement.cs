@@ -8,11 +8,17 @@ public class Movement : MonoBehaviour
     public GameObject rightleg;
     Rigidbody2D leftLegRB;
     Rigidbody2D rightLegRB;
+    public Rigidbody2D rb;
 
     public Animator anim;
 
     [SerializeField] float speed = 1.5f;
     [SerializeField] float stepWait = .5f;
+    [SerializeField] float jumpForce = 10;
+    private bool isOnGround;
+    public float positionRadius;
+    public LayerMask ground;
+    public Transform playerPos;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,6 +48,13 @@ public class Movement : MonoBehaviour
         {
             anim.Play("Idle");
         }
+
+        isOnGround = Physics2D.OverlapCircle(playerPos.position, positionRadius, ground);
+        if (isOnGround == true && Input.GetKeyDown(KeyCode.Space))
+        {
+            rb.AddForce(Vector2.up * jumpForce);
+        }
+
     }
 
     IEnumerator MoveRight(float seconds)
